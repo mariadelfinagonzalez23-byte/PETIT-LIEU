@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendario de Efemérides 2026 – Petit Lieu</title>
+  <style>
+    :root {
+      --brand-dark:  #2c1a0e;
+      --brand-gold:  #c9a84c;
+      --brand-cream: #fdf6ec;
+      --brand-red:   #9b2335;
+      --brand-green: #3a5a40;
+      --brand-gray:  #6b6b6b;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--brand-cream);
+      color: var(--brand-dark);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--brand-dark);
+      color: var(--brand-cream);
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+      position: relative;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      letter-spacing: 0.12em;
+      color: var(--brand-gold);
+    }
+    header p {
+      margin-top: 0.4rem;
+      font-style: italic;
+      color: #c8b89a;
+      font-size: 1rem;
+    }
+    .year-badge {
+      display: inline-block;
+      margin-top: 0.8rem;
+      background: var(--brand-gold);
+      color: var(--brand-dark);
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0.2rem 1.2rem;
+      border-radius: 20px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: #3e2a17;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav a {
+      color: var(--brand-gold);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--brand-gold);
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    nav a:hover {
+      background: var(--brand-gold);
+      color: var(--brand-dark);
+    }
+
+    /* ── LEYENDA ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem 1.4rem;
+      padding: 1rem 1rem 0.5rem;
+      font-size: 0.82rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── GRID PRINCIPAL ── */
+    .months-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem 1.5rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── TARJETA MES ── */
+    .month-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .month-header {
+      background: var(--brand-dark);
+      color: var(--brand-gold);
+      padding: 0.8rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .month-header .month-icon { font-size: 1.4rem; }
+    .month-header h2 { font-size: 1.15rem; letter-spacing: 0.06em; }
+
+    /* ── MINI CALENDARIO ── */
+    .mini-cal {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid #f0e8da;
+    }
+    .mini-cal table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .mini-cal th {
+      color: var(--brand-gray);
+      font-weight: normal;
+      text-align: center;
+      padding: 2px 0;
+    }
+    .mini-cal td {
+      text-align: center;
+      padding: 3px 2px;
+      border-radius: 4px;
+      cursor: default;
+    }
+    .mini-cal td.has-event {
+      background: var(--brand-gold);
+      color: var(--brand-dark);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .mini-cal td.holiday { background: #fce8e8; color: var(--brand-red); font-weight: bold; }
+    .mini-cal td.gastro  { background: #e8f4e8; color: var(--brand-green); font-weight: bold; }
+    .mini-cal td.social  { background: #fff0d0; color: #8b6914; font-weight: bold; }
+    .mini-cal td.empty   { color: #ccc; }
+
+    /* ── LISTA DE EVENTOS ── */
+    .events-list { padding: 0.8rem 1rem 1rem; }
+    .event-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid #f5efe5;
+    }
+    .event-item:last-child { border-bottom: none; }
+    .event-date {
+      min-width: 32px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--brand-dark);
+      text-align: right;
+    }
+    .event-tag {
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      white-space: nowrap;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .tag-feriado  { background:#fce8e8; color:var(--brand-red); }
+    .tag-gastro   { background:#e8f4e8; color:var(--brand-green); }
+    .tag-social   { background:#fff0d0; color:#8b6914; }
+    .tag-comercial{ background:#e8ecff; color:#2a3a8b; }
+
+    .event-text { font-size: 0.83rem; line-height: 1.4; }
+    .event-tip {
+      font-size: 0.72rem;
+      color: var(--brand-gray);
+      margin-top: 1px;
+      font-style: italic;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--brand-gray);
+      border-top: 2px solid var(--brand-gold);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>✦ PETIT LIEU ✦</h1>
+  <p>Calendario de Efemérides &amp; Fechas Clave</p>
+  <div class="year-badge">2026</div>
+</header>
+
+<nav>
+  <a href="#ene">Enero</a><a href="#feb">Febrero</a><a href="#mar">Marzo</a>
+  <a href="#abr">Abril</a><a href="#may">Mayo</a><a href="#jun">Junio</a>
+  <a href="#jul">Julio</a><a href="#ago">Agosto</a><a href="#sep">Septiembre</a>
+  <a href="#oct">Octubre</a><a href="#nov">Noviembre</a><a href="#dic">Diciembre</a>
+</nav>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:#f28b82"></div> Feriado nacional</div>
+  <div class="legend-item"><div class="dot" style="background:#81c995"></div> Efeméride gastronómica</div>
+  <div class="legend-item"><div class="dot" style="background:#fdd663"></div> Fecha social / comercial</div>
+  <div class="legend-item"><div class="dot" style="background:#a8c7fa"></div> Oportunidad de marketing</div>
+</div>
+
+<div class="months-grid">
+
+  <!-- ══════════ ENERO ══════════ -->
+  <div class="month-card" id="ene">
+    <div class="month-header">
+      <span class="month-icon">🥂</span>
+      <h2>ENERO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr>
+          <td></td><td></td><td></td><td><b>1</b></td><td>2</td><td>3</td><td>4</td>
+        </tr>
+        <tr><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr>
+        <tr><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td></tr>
+        <tr><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td></tr>
+        <tr><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">1</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Año Nuevo</div>
+          <div class="event-tip">Brindis de bienvenida 2026 — menú especial de temporada</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">6</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día de Reyes</div>
+          <div class="event-tip">Roscón de Reyes, chocolates, experiencia temática para familias</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">16</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial del Macarrón</div>
+          <div class="event-tip">Especial de pastas artesanales en el menú del día</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">20</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial del Queso</div>
+          <div class="event-tip">Tabla de quesos, maridaje con vinos</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">24</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Nacional del Empanada (ARG)</div>
+          <div class="event-tip">Promoción especial de empanadas artesanales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FEBRERO ══════════ -->
+  <div class="month-card" id="feb">
+    <div class="month-header">
+      <span class="month-icon">💝</span>
+      <h2>FEBRERO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+        <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+        <tr><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+        <tr><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td></tr>
+        <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">9</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial de la Pizza</div>
+          <div class="event-tip">Variedad de pizzas artesanales, maridaje con espumantes</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">14</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día de San Valentín</div>
+          <div class="event-tip">Menú romántico para dos, decoración especial, postre sorpresa</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">16</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Carnaval (lunes)</div>
+          <div class="event-tip">Feriado largo — eventos temáticos, cócteles de temporada</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">17</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Carnaval (martes) — Feriado nacional</div>
+          <div class="event-tip">Brunch especial, música en vivo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ MARZO ══════════ -->
+  <div class="month-card" id="mar">
+    <div class="month-header">
+      <span class="month-icon">🌸</span>
+      <h2>MARZO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+        <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+        <tr><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+        <tr><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td></tr>
+        <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td></tr>
+        <tr><td>30</td><td>31</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">8</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día Internacional de la Mujer</div>
+          <div class="event-tip">Menú especial, cóctel de bienvenida, ambiente festivo para ellas</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">20</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día Nacional de la Memoria — Feriado</div>
+          <div class="event-tip">Verificar apertura / cierre según política del local</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Inicio de otoño</div>
+          <div class="event-tip">Lanzamiento de carta de otoño — nuevos platos de temporada</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">27</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día Mundial del Teatro</div>
+          <div class="event-tip">Noche cultural con actuaciones, maridaje gastronómico</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ABRIL ══════════ -->
+  <div class="month-card" id="abr">
+    <div class="month-header">
+      <span class="month-icon">🐣</span>
+      <h2>ABRIL</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+        <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+        <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
+        <tr><td>27</td><td>28</td><td>29</td><td>30</td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">2</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día del Veterano y de los Caídos en Malvinas</div>
+          <div class="event-tip">Feriado nacional inamovible</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">3</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Jueves Santo</div>
+          <div class="event-tip">Menú de pescados y mariscos, opciones sin carne</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">4</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Viernes Santo — Feriado</div>
+          <div class="event-tip">Menú de ayuno: pescados, risottos, opciones vegetarianas</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">5</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Sábado de Gloria</div>
+          <div class="event-tip">Brunch familiar, huevos de Pascua, chocolates artesanales</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">6</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Domingo de Pascua</div>
+          <div class="event-tip">Almuerzo especial familiar — reserva anticipada</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">22</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día de la Tierra</div>
+          <div class="event-tip">Menú sustentable, ingredientes locales y de estación</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">29</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día del Animal</div>
+          <div class="event-tip">Opción de menú plant-based para la semana</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ MAYO ══════════ -->
+  <div class="month-card" id="may">
+    <div class="month-header">
+      <span class="month-icon">🌹</span>
+      <h2>MAYO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td></td><td></td><td>1</td><td>2</td><td>3</td></tr>
+        <tr><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+        <tr><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td></tr>
+        <tr><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr>
+        <tr><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">1</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día del Trabajador — Feriado</div>
+          <div class="event-tip">Almuerzo y cena familiar — alta demanda prevista</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">10</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día de la Madre (2.º domingo de mayo)</div>
+          <div class="event-tip">Menú especial, flores, detalle para mamá — reserva con anticipación</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">15</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día del Fernet (ARG)</div>
+          <div class="event-tip">Cócteles especiales con Fernet, maridaje con comida típica</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">25</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">25 de Mayo — Feriado Nacional</div>
+          <div class="event-tip">Locro, humita, empanadas — menú patrio especial</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ JUNIO ══════════ -->
+  <div class="month-card" id="jun">
+    <div class="month-header">
+      <span class="month-icon">☕</span>
+      <h2>JUNIO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+        <tr><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td></tr>
+        <tr><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td></tr>
+        <tr><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td></tr>
+        <tr><td>29</td><td>30</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">20</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día de la Bandera — Feriado</div>
+          <div class="event-tip">Jornada patriótica — menú del día con colores nacionales</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Inicio de invierno — Día del Mate (ARG)</div>
+          <div class="event-tip">Lanzamiento carta invernal: fondues, sopas, platos calientes</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día del Padre (3.er domingo de junio)</div>
+          <div class="event-tip">Menú especial para papá, maridaje con cervezas artesanales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ JULIO ══════════ -->
+  <div class="month-card" id="jul">
+    <div class="month-header">
+      <span class="month-icon">🍫</span>
+      <h2>JULIO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+        <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+        <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
+        <tr><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">7</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial del Chocolate</div>
+          <div class="event-tip">Postres especiales, fondue de chocolate, menú dulce</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">9</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día de la Independencia — Feriado</div>
+          <div class="event-tip">Cocina regional argentina, alfajores artesanales, locro</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">11</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial de la Population (ONU) — Bienestar</div>
+          <div class="event-tip">Menú saludable, opciones sin gluten y veganas destacadas</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">18</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día del Helado Artesanal (ARG)</div>
+          <div class="event-tip">Helados de autor, sabores de temporada, degustación</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ AGOSTO ══════════ -->
+  <div class="month-card" id="ago">
+    <div class="month-header">
+      <span class="month-icon">👧</span>
+      <h2>AGOSTO</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td>1</td><td>2</td></tr>
+        <tr><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+        <tr><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td></tr>
+        <tr><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td></tr>
+        <tr><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td></tr>
+        <tr><td>31</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">9</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día del Niño (2.º domingo de agosto)</div>
+          <div class="event-tip">Menú kids, actividades, postres divertidos, regalitos</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">12</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Internacional del Gin</div>
+          <div class="event-tip">Cóctel del mes: gin tonics artesanales con botánicos locales</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">17</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Paso a la Inmortalidad del Gral. San Martín — Feriado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">19</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial de la Fotografía</div>
+          <div class="event-tip">Concurso de fotos del plato — UGC para redes sociales</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SEPTIEMBRE ══════════ -->
+  <div class="month-card" id="sep">
+    <div class="month-header">
+      <span class="month-icon">🌼</span>
+      <h2>SEPTIEMBRE</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+        <tr><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td></tr>
+        <tr><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td></tr>
+        <tr><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td></tr>
+        <tr><td>29</td><td>30</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">11</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día del Maestro — Feriado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Inicio de primavera</div>
+          <div class="event-tip">Lanzamiento carta de primavera — platos frescos y livianos</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Día del Estudiante</div>
+          <div class="event-tip">Promo estudiantes con DNI — descuento o 2×1 en bebidas</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">25</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial del Sushi</div>
+          <div class="event-tip">Special de cocina japonesa o fusión asian-argentina</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">29</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día del Cocinero (ARG)</div>
+          <div class="event-tip">Reconocimiento al equipo de cocina — evento especial, redes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ OCTUBRE ══════════ -->
+  <div class="month-card" id="oct">
+    <div class="month-header">
+      <span class="month-icon">🍷</span>
+      <h2>OCTUBRE</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+        <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+        <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
+        <tr><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">1</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Internacional del Café</div>
+          <div class="event-tip">Menú de cafés de especialidad, maridaje con postres, barista show</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">5</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial del Malbec</div>
+          <div class="event-tip">Cata de Malbec, maridaje con cortes de carne y tabla de quesos</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">12</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día del Respeto a la Diversidad Cultural — Feriado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">16</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial de la Alimentación</div>
+          <div class="event-tip">Menú nutritivo, comunicación sobre origen de ingredientes</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">20</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Internacional del Chef</div>
+          <div class="event-tip">Presentación del chef/equipo en redes — detrás de escena</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">31</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Halloween</div>
+          <div class="event-tip">Decoración temática, cócteles de temporada, postre «terrorífico»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ NOVIEMBRE ══════════ -->
+  <div class="month-card" id="nov">
+    <div class="month-header">
+      <span class="month-icon">🍂</span>
+      <h2>NOVIEMBRE</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td>1</td><td>2</td></tr>
+        <tr><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+        <tr><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td></tr>
+        <tr><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td></tr>
+        <tr><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">2</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día de los Difuntos / Día de Muertos</div>
+          <div class="event-tip">Menú con referencias culturales, flores de cempasúchil, ambiente especial</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">14</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día Mundial de la Diabetes</div>
+          <div class="event-tip">Destacar opciones sin azúcar, postres saludables en el menú</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">20</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Día de la Soberanía Nacional — Feriado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">24</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Día del Vino Argentino</div>
+          <div class="event-tip">Cata de vinos, cena maridaje, sommelier invitado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">27</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Black Friday</div>
+          <div class="event-tip">Promociones en reservas, gift cards, vouchers de regalo navideños</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ DICIEMBRE ══════════ -->
+  <div class="month-card" id="dic">
+    <div class="month-header">
+      <span class="month-icon">🎄</span>
+      <h2>DICIEMBRE</h2>
+    </div>
+    <div class="mini-cal">
+      <table>
+        <tr><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th><th>Do</th></tr>
+        <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+        <tr><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td></tr>
+        <tr><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td></tr>
+        <tr><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td></tr>
+        <tr><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">1</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Inicio de temporada navideña</div>
+          <div class="event-tip">Decoración navideña, menú de diciembre, venta de gift cards</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">8</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Inmaculada Concepción — Feriado</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">21</div>
+        <span class="event-tag tag-gastro">Gastro</span>
+        <div>
+          <div class="event-text">Inicio de verano</div>
+          <div class="event-tip">Lanzamiento carta de verano — platos fríos, cócteles refrescantes</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">24</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Nochebuena</div>
+          <div class="event-tip">Cena especial con reserva — menú cerrado de 4 pasos, maridaje opcional</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">25</div>
+        <span class="event-tag tag-feriado">Feriado</span>
+        <div>
+          <div class="event-text">Navidad — Feriado</div>
+          <div class="event-tip">Brunch navideño familiar o cierre según política del local</div>
+        </div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">31</div>
+        <span class="event-tag tag-social">Social</span>
+        <div>
+          <div class="event-text">Nochevieja</div>
+          <div class="event-tip">Cena de gala con menú cerrado, cotillón, brindis a medianoche</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /months-grid -->
+
+<footer>
+  <strong>✦ PETIT LIEU ✦</strong> &nbsp;|&nbsp; Calendario de Efemérides 2026
+  <br>Los feriados nacionales están sujetos a confirmación oficial del Poder Ejecutivo Nacional.
+</footer>
+
+</body>
+</html>
